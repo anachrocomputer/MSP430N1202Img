@@ -13,11 +13,17 @@ LDFLAGS=$(COMMON) -Wl,-Map=n1202img.map,--relax
 all: n1202img.elf
 .PHONY: all
 
-n1202img.o: n1202img.c
-	$(CC) $(CFLAGS) -o $@ $^
+ppm2h: ppm2h.c
+	gcc -o $@ $<
+
+dorkdemo.h: dorkdemo.ppm ppm2h
+	./ppm2h $< >dorkdemo.h
+
+n1202img.o: n1202img.c dorkdemo.h
+	$(CC) $(CFLAGS) -o $@ $<
 
 n1202img.elf: n1202img.o
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $<
 
 prog: n1202img.elf
 	mspdebug rf2500 'prog n1202img.elf'
