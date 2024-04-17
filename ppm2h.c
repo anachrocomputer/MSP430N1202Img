@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main (int argc, char *argv[])
+int main(const int argc, const char *argv[])
 {
    char lin[256];
    int i;
@@ -15,30 +15,31 @@ int main (int argc, char *argv[])
    FILE *fp;
    
    if (argc != 2) {
-      fprintf (stderr, "Usage: ppm2h <ppm_file>\n");
-      exit (1);
+      fprintf(stderr, "Usage: ppm2h <ppm_file>\n");
+      exit(1);
    }
    
-   if ((fp = fopen (argv[1], "r")) == NULL) {
-      perror (argv[1]);
-      exit (1);
+   if ((fp = fopen(argv[1], "r")) == NULL) {
+      perror(argv[1]);
+      exit(1);
    }
    
-   fgets (lin, 256, fp);
+   fgets(lin, 256, fp);
    
-   if (strncmp (lin, "P3", 2) != 0) {
-      fprintf (stderr, "Portable Pixel Map (PPM) file must be saved in ASCII format\n");
-      exit (1);
+   if (strncmp(lin, "P3", 2) != 0) {
+      fprintf(stderr, "Portable Pixel Map (PPM) file must be saved in ASCII format\n");
+      exit(1);
    }
    
-   fgets (lin, 256, fp);
-   fgets (lin, 256, fp);
+   fgets(lin, 256, fp);
+   fgets(lin, 256, fp);
    
    for (row = 0; row < 68; row++) {
       for (col = 0; col < 96; col++) {
-         fscanf (fp, "%d", &pixel);
-         fscanf (fp, "%d", &pixel);
-         fscanf (fp, "%d", &pixel);
+         fscanf(fp, "%d", &pixel);
+         fscanf(fp, "%d", &pixel);
+         fscanf(fp, "%d", &pixel);
+         
          if (pixel == 0)
             map[row][col] = 0;
          else
@@ -57,18 +58,18 @@ int main (int argc, char *argv[])
    for (row = 0; row < 68; row++) {
       for (col = 0; col < 78; col++) {
          if (map[row][col] == 0)
-            printf ("*");
+            printf("*");
          else
-            printf (" ");
+            printf(" ");
       }
       
-      printf ("\n");
+      printf("\n");
    }
    
-   exit (0);
+   exit(0);
 #endif
 
-   printf ("const unsigned char dork[96*9] = {\n");
+   printf("const unsigned char dork[96*9] = {\n");
    
    for (row = 0; row < 9; row++) {
       for (col = 0; col < 96; col ++) {
@@ -78,19 +79,21 @@ int main (int argc, char *argv[])
                b |= 1 << i;
          }
          
-         printf ("0x%02x", b);
+         printf("0x%02x", b);
          
          if ((row == 8) && (col == 95)) 
-            printf ("\n");
+            printf("\n");
          else if ((col % 8) == 7)
-            printf (", \n");
+            printf(", \n");
          else
-            printf (", ");
+            printf(", ");
       }
    }
    
-   printf ("};\n");
+   printf("};\n");
    
-   fclose (fp);
+   fclose(fp);
+   
+   return (EXIT_SUCCESS);
 }
 
