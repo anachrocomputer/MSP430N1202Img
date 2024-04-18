@@ -17,9 +17,12 @@ ppm2h: ppm2h.c
 	gcc -o $@ $<
 
 dorkdemo.h: dorkdemo.ppm ppm2h
-	./ppm2h $< >dorkdemo.h
+	./ppm2h $< Dorkdemo >dorkdemo.h
 
-n1202img.o: n1202img.c dorkdemo.h
+popup.h: popup.ppm ppm2h
+	./ppm2h $< Popup >popup.h
+
+n1202img.o: n1202img.c dorkdemo.h popup.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 n1202img.elf: n1202img.o

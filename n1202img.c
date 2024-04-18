@@ -3,6 +3,7 @@
 #include <msp430.h>
 
 #include "dorkdemo.h"
+#include "popup.h"
 
 #define SDA     BIT5
 #define SCK     BIT7
@@ -21,6 +22,7 @@ void dally(const int dally);
 int main(void)
 {
    int i;
+   int row, col;
    
    WDTCTL = WDTHOLD | WDTPW;   // Disable watchdog timer
 
@@ -33,12 +35,18 @@ int main(void)
 
    // Display 96x68 pixel image
    for (i = 0; i < (9 * 96); i++)
-      n1202write(LCD_DATA | dork[i]);
+      n1202write(LCD_DATA | Dorkdemo[i]);
       
    for (i = 0; i < 100; i++)
       dally(10000);
    
-   n1202write(0xA7);   // Display reversed (inverse video)
+   // Display popup image
+   for (row = 0; row < 4; row++) {
+      n1202goto(row + 2, (96 - 48) / 2);
+      
+      for (col = 0; col < 48; col++)
+         n1202write(LCD_DATA | Popup[(row * 48) + col]);
+   }
    
    while (1)
       ;

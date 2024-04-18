@@ -10,12 +10,14 @@ int main(const int argc, const char *argv[])
    char lin[256];
    int i;
    int row, col;
+   int wd, ht;
+   int nrows;
    int pixel, b;
    unsigned char map[72][96];
    FILE *fp;
    
-   if (argc != 2) {
-      fprintf(stderr, "Usage: ppm2h <ppm_file>\n");
+   if (argc != 3) {
+      fprintf(stderr, "Usage: ppm2h <ppm_file> <C_name>\n");
       exit(1);
    }
    
@@ -34,8 +36,14 @@ int main(const int argc, const char *argv[])
    fgets(lin, 256, fp);
    fgets(lin, 256, fp);
    
-   for (row = 0; row < 68; row++) {
-      for (col = 0; col < 96; col++) {
+   if (sscanf(lin, "%d %d", &wd, &ht) != 2) {
+      fprintf(stderr, "Cannot read width & height\n");
+      fclose(fp);
+      exit(1);
+   }
+   
+   for (row = 0; row < ht; row++) {
+      for (col = 0; col < wd; col++) {
          fscanf(fp, "%d", &pixel);
          fscanf(fp, "%d", &pixel);
          fscanf(fp, "%d", &pixel);
@@ -47,8 +55,8 @@ int main(const int argc, const char *argv[])
       }
    }
    
-   /* Fill in four dummy rows of white pixels at the bottom */
-   for (row = 68; row < 72; row++) {
+   /* Fill in dummy rows of white pixels at the bottom */
+   for ( ; row < 72; row++) {
       for (col = 0; col < 96; col++) {
          map[row][col] = 1;
       }
@@ -68,11 +76,13 @@ int main(const int argc, const char *argv[])
    
    exit(0);
 #endif
-
-   printf("const unsigned char dork[96*9] = {\n");
    
-   for (row = 0; row < 9; row++) {
-      for (col = 0; col < 96; col ++) {
+   nrows = (ht + 7) / 8;
+   
+   printf("const unsigned char %s[%d*%d] = {\n", argv[2], wd, nrows);
+   
+   for (row = 0; row < nrows; row++) {
+      for (col = 0; col < wd; col ++) {
          b = 0;
          for (i = 0; i < 8; i++) {
             if (map[(row * 8) + i][col] == 0)
@@ -81,7 +91,7 @@ int main(const int argc, const char *argv[])
          
          printf("0x%02x", b);
          
-         if ((row == 8) && (col == 95)) 
+         if ((row == (nrows - 1)) && (col == (wd - 1)))
             printf("\n");
          else if ((col % 8) == 7)
             printf(", \n");
